@@ -21,7 +21,12 @@ import datetime
 import env
 from env import user, password, host, get_connection
 
+import math
 from math import sqrt
+
+
+from sklearn.linear_model import LinearRegression, LassoLars, TweedieRegressor
+from sklearn.feature_selection import SelectKBest, RFE, f_regression
 
 
 '''function that will either 
@@ -156,7 +161,7 @@ def clean_zillow_dataset(df):
     df['transaction_date'] = pd.to_datetime(df['transaction_date'], format = '%Y/%m/%d')
 
     # returning the cleaned dataset
-    print(f'dataframe shape: {df.shape}')
+    # print(f'dataframe shape: {df.shape}')
 
     return df
 
@@ -191,9 +196,51 @@ def age_of_homes(df):
     # placing column/series back into main df
     df["home_age"] = 2017 - year_built
 
+    # returning the cleaned dataset
+    print(f'dataframe shape: {df.shape}')
+
     return df
 
+'''Function created to determine continuous variable/feature lower/upper bounds using an interquartile range method'''
+def get_lower_and_upper_bounds(df):
+    holder = []
+    num_lst = df.select_dtypes("number").columns.tolist()
+    num_lst = [ele for ele in num_lst if ele not in ("parcel_id", 'longitude', 'latitude', 'blockgroup_assignment')]
+    k = 1.5
 
+    # determining continuous features/columns
+    for col in df[num_lst]:
+        
+        # determing 1st and 3rd quartile
+        q1, q3 = df[col].quantile([.25, 0.75])
+        
+        # calculate interquartile range
+        iqr = q3 - q1
+        
+        # set feature/data lower bound limit
+        lower_bound = q1 - k * iqr
+
+        # set feature/data upperbound limit
+        upper_bound = q3 + k * iqr
+        
+        metrics = { 
+            "column": col,
+            "column type": df[col].dtype,
+            "iqr": round(iqr, 5),
+            "lower_bound": round(lower_bound, 5),
+            "lower_outliers": len(df[df[col] < lower_bound]),
+            "upper_bound": round(upper_bound, 5),
+            "upper_outliers": len(df[df[col] > upper_bound])
+        }
+
+        holder.append(metrics)
+
+    new_df = pd.DataFrame(holder)
+
+    # returning the cleaned dataset
+    print(f'dataframe shape: {new_df.shape}')
+
+    return new_df
 
 '''Function takes in a dataframe and returns a feature/column total null count and percentage df'''
 def null_df(df):
@@ -297,36 +344,157 @@ def sum_outliers(df, k = 1.5):
     
     new_df = pd.DataFrame(uppercap_df).sort_values(by = "Total Outliers", ascending = False, ).reset_index(drop = True)
     
+    print()
     return new_df
 
 
 def zillow_outliers(df):
 
-    df = df[df["home_value"] >= (-443469.50)]
-    df = df[df["home_value"] <= 1256382.50]
+    df = df[(np.isnan(df["home_value"])) | (df["home_value"] >= -443469.50)]
+    df = df[(np.isnan(df["home_value"])) | (df["home_value"] <= 1256382.50)]
 
-    df = df[df["logerror"] >= (-0.12)]
-    df = df[df["logerror"] <= 0.14]
+    df = df[(np.isnan(df["logerror"])) | (df["logerror"] >= -0.12)]
+    df = df[(np.isnan(df["logerror"])) | (df["logerror"] <= 0.14)]
 
-    df = df[df["bedroom_count"] >= 1.00]
-    df = df[df["bedroom_count"] <= 5.50]
+    df = df[(np.isnan(df["bedroom_count"])) | (df["bedroom_count"] >= 1.00)]
+    df = df[(np.isnan(df["bedroom_count"])) | (df["bedroom_count"] <= 5.50)]
 
-    df = df[df["bathroom_count"] >= 0.5]
-    df = df[df["bathroom_count"] <= 4.5]
+    df = df[(np.isnan(df["bathroom_count"])) | (df["bathroom_count"] >= 0.5)]
+    df = df[(np.isnan(df["bathroom_count"])) | (df["bathroom_count"] <= 4.5)]
 
-    df = df[df["living_sq_feet"] >= (-289.00)]
-    df = df[df["living_sq_feet"] <= 3863.00]
+    df = df[(np.isnan(df["living_sq_feet"])) | (df["living_sq_feet"] >= -289.00)]
+    df = df[(np.isnan(df["living_sq_feet"])) | (df["living_sq_feet"] <= 3863.00)]
 
-    df = df[df["property_sq_feet"] >= 775.00]
-    df = df[df["property_sq_feet"] <= 13591.00]
+    df = df[(np.isnan(df["property_sq_feet"])) | (df["property_sq_feet"] >= 775.00)]
+    df = df[(np.isnan(df["property_sq_feet"])) | (df["property_sq_feet"] <= 13591.00)]
 
-    df = df[df["year_built"] >= 1906.00]
-    df = df[df["year_built"] <= 2022.00]
+    df = df[(np.isnan(df["year_built"])) | (df["year_built"] >= 1906.00)]
+    df = df[(np.isnan(df["year_built"])) | (df["year_built"] <= 2022.00)]
 
-    df = df[df["home_age"] >= 1.00]
-    df = df[df["home_age"] <= 110.50]
+    df = df[(np.isnan(df["home_age"])) | (df["home_age"] >= 1.00)]
+    df = df[(np.isnan(df["home_age"])) | (df["home_age"] <= 110.50)]
+
+    # returning the cleaned dataset
+    print(f'dataframe shape: {df.shape}')
 
     return df
+
+
+
+'''Function creates transaction quarter bins'''
+def get_transaction_quarters(train_df, val_df, test_df):
+    # train dataset
+    train_df["q1_transaction"] = (train_df["transaction_month"] == "January") | (train_df["transaction_month"] == "February") | (train_df["transaction_month"] == "March")
+    train_df["q2_transaction"] = (train_df["transaction_month"] == "April") | (train_df["transaction_month"] == "May") | (train_df["transaction_month"] == "June")
+    train_df["q3_transaction"] = (train_df["transaction_month"] == "July") | (train_df["transaction_month"] == "August") | (train_df["transaction_month"] == "September")
+
+    # validate dataset
+    val_df["q1_transaction"] = (val_df["transaction_month"] == "January") | (val_df["transaction_month"] == "February") | (val_df["transaction_month"] == "March")
+    val_df["q2_transaction"] = (val_df["transaction_month"] == "April") | (val_df["transaction_month"] == "May") | (val_df["transaction_month"] == "June")
+    val_df["q3_transaction"] = (val_df["transaction_month"] == "July") | (val_df["transaction_month"] == "August") | (val_df["transaction_month"] == "September")
+
+    # test dataset
+    test_df["q1_transaction"] = (test_df["transaction_month"] == "January") | (test_df["transaction_month"] == "February") | (test_df["transaction_month"] == "March")
+    test_df["q2_transaction"] = (test_df["transaction_month"] == "April") | (test_df["transaction_month"] == "May") | (test_df["transaction_month"] == "June")
+    test_df["q3_transaction"] = (test_df["transaction_month"] == "July") | (test_df["transaction_month"] == "August") | (test_df["transaction_month"] == "September")
+
+    # returning the dataframes
+    return train_df, val_df, test_df
+
+
+'''Function creates new dataframes with dummy variables for modeling'''
+def get_dummy_dataframes(train_df, val_df, test_df):
+    # generate dummy variables for the following and scale our data
+
+    # train dataset
+    train_dummy = pd.get_dummies(data = train_df, columns = [
+        'transaction_month', 
+        'home_age_binned',
+        'bathroom_count',
+        'bedroom_count',
+        'county_by_fips',
+        'living_sqfeet_binned',
+        'transaction_quarter'],
+        drop_first = False, 
+        dtype = bool)
+
+    # validate dataset
+    validate_dummy = pd.get_dummies(data = val_df, columns = [
+        'transaction_month', 
+        'home_age_binned',
+        'bathroom_count',
+        'bedroom_count',
+        'county_by_fips',
+        'living_sqfeet_binned',
+        'transaction_quarter'],
+        drop_first = False, 
+        dtype = bool)
+
+    # test dataset
+    test_dummy = pd.get_dummies(data = test_df, columns = [
+        'transaction_month', 
+        'home_age_binned',
+        'bathroom_count',
+        'bedroom_count',
+        'county_by_fips',
+        'living_sqfeet_binned',
+        'transaction_quarter'],
+        drop_first = False, 
+        dtype = bool)
+
+    # checking the train dataset
+    return train_dummy, validate_dummy, test_dummy
+
+
+# creating dummy dataframes with generated clusters
+'''After clustering, this function intends to create dummy variables for
+clusters and remaining features in order to help with modeling'''
+def get_cluster_dummy(train_df, val_df, test_df):
+
+    # train dataset
+    train_dummy = pd.get_dummies(data = train_df, columns = [
+        'transaction_month',
+        'county_by_fips',
+        'home_age_binned',
+        'living_sqfeet_binned',
+        'bathroom_count',
+        'bedroom_count',
+        'month_clusters',
+        'era_clusters',
+        'size_clusters'],
+        drop_first = False, 
+        dtype = bool)
+
+    # validate dataset
+    validate_dummy = pd.get_dummies(data = val_df, columns = [
+        'transaction_month',
+        'county_by_fips',
+        'home_age_binned',
+        'living_sqfeet_binned',
+        'bathroom_count',
+        'bedroom_count',
+        'month_clusters',
+        'era_clusters',
+        'size_clusters'],
+        drop_first = False, 
+        dtype = bool)
+
+    # test dataset
+    test_dummy = pd.get_dummies(data = test_df, columns = [
+        'transaction_month',
+        'county_by_fips',
+        'home_age_binned',
+        'living_sqfeet_binned',
+        'bathroom_count',
+        'bedroom_count',
+        'month_clusters',
+        'era_clusters',
+        'size_clusters'],
+        drop_first = False, 
+        dtype = bool)
+
+    # returning the new dataframes
+    return train_dummy, validate_dummy, test_dummy
 
 
 
@@ -370,16 +538,16 @@ def train_iterative_imputer(train_df):
 
         # placeholder for continuous features
         num_lst = [
-        'home_value_capped',
-        'bathroom_count_capped',
-        'bedroom_count_capped',
-        'living_sq_feet_capped',
+        'home_value',
+        'bathroom_count',
+        'bedroom_count',
+        'living_sq_feet',
         'latitude',
         'longitude',
-        'property_sq_feet_capped',
-        'blockgroup_assignment_capped',
+        'property_sq_feet',
+        'blockgroup_assignment',
         'year_built',
-        'home_age_capped']
+        'home_age']
 
         # creating the "thing"
         imputer = IterativeImputer(
@@ -400,16 +568,65 @@ def train_iterative_imputer(train_df):
         return train_df
 
 
+'''Function takes in all three split datasets and imputes missing values in validate and test after
+fitting on training dataset columns'''
+def impute_val_and_test(train_df, val_df, test_df):
+
+    num_lst = [
+            'bathroom_count',
+            'bedroom_count',
+            'living_sq_feet',
+            'latitude',
+            'longitude',
+            'property_sq_feet',
+            'blockgroup_assignment',
+            'year_built',
+            'home_age']
+
+    # creating the "thing"
+    imputer = IterativeImputer(
+            missing_values = np.nan, \
+            skip_complete = True, \
+            random_state = 123)
+
+    # fitting the "thing" and transforming it
+    imputed = imputer.fit(train_df[num_lst])
+
+    val_imputed = imputed.transform(val_df[num_lst])
+    X_validate_imputed = pd.DataFrame(val_imputed, index = val_df.index)
+    val_df[num_lst] = X_validate_imputed
+    validate_imputed = val_df
+
+    test_imputed = imputed.transform(test_df[num_lst])
+    test_imputed = pd.DataFrame(test_imputed, index = test_df.index)
+    test_df[num_lst] = test_imputed
+    test_imputed = test_df
+
+    # checking the dataset for nulls
+    print('null results in: validate')
+    print('----------------------------|---------')
+    print(f'{validate_imputed.isnull().sum()}')
+    print()
+    print('null results in: test')
+    print('----------------------------|---------')
+    print(f'{test_imputed.isnull().sum()}')
+
+    # returning the imputed validate and test datasets
+
+    return validate_imputed, test_imputed
+
+
 # function establishes a baseline for train and validate - will be used for model comparison:
 def establish_baseline(train, validate):
 
-    baseline = round(train["logerror_capped"].mean(), 2)
+    baseline_train = round(train["logerror"].mean(), 2)
+    baseline_val = round(validate["logerror"].mean(), 2)
 
-    train['baseline'] = baseline
-    validate['baseline'] = baseline
+    train['baseline'] = baseline_train
+    validate['baseline'] = baseline_val
 
-    train_rmse = sqrt(mean_squared_error(train.logerror_capped, train.baseline))
-    validate_rmse = sqrt(mean_squared_error(validate.logerror_capped, validate.baseline))
+    train_rmse = sqrt(mean_squared_error(train.logerror, train.baseline))
+    validate_rmse = sqrt(mean_squared_error(validate.logerror, validate.baseline))
 
     print('Train baseline RMSE: {:.2f}'.format(train_rmse))
     print('Validate baseline RMSE: {:.2f}'.format(validate_rmse))
@@ -421,6 +638,38 @@ def establish_baseline(train, validate):
     print(f'validate shape: {validate.shape}')
 
     return train, validate
+
+
+# creating a recursive feature eliminate function
+def recursive_feature_eliminate(X_train, y_train, number_of_top_features):
+
+    # initialize the ML algorithm
+    lm = LinearRegression()
+
+    rfe = RFE(lm, n_features_to_select = number_of_top_features)
+
+    # fit the data using RFE
+    rfe.fit(X_train, y_train) 
+
+    # get the mask of the columns selected
+    feature_mask = rfe.support_
+
+    # get list of the column names
+    rfe_features = X_train.iloc[:,feature_mask].columns.tolist()
+
+    # view list of columns and their ranking
+    # get the ranks using "rfe.ranking" method
+    variable_ranks = rfe.ranking_
+
+    # get the variable names
+    variable_names = X_train.columns.tolist()
+
+    # combine ranks and names into a df for clean viewing
+    rfe_ranks_df = pd.DataFrame({'Feature': variable_names, 'Ranking': variable_ranks})
+
+    # sort the df by rank
+    return rfe_ranks_df.sort_values('Ranking')
+
 
 # Function returns rasidual/error reports for model predictions
 def get_error_report(y, y_hat):
@@ -455,6 +704,98 @@ def get_error_report(y, y_hat):
     return SSE, ESS, TSS, MSE, RMSE
 
 
+
+# creating a melted model column to help with plotting
+def get_melted_table(df):
+
+    baseline = df["baseline_mean_predictions"].median()
+    
+    df1 = df[[
+      'logerror actual',
+      'pca_predictions',
+      'polynomial degree 2', 
+      'linear_predictions', 
+      'lars_predictions', 
+      'glm_predictions']]
+    
+    melt_df = df1.melt("logerror actual", var_name = 'cols',
+                    value_name = 'vals')
+    
+    melt_df["baseline_prediction"] = baseline
+    melt_df["residual"] = melt_df["logerror actual"] - melt_df['vals']
+
+    return melt_df
+
+
+# Model Residual (error) Plot
+def plot_model_residuals(melt_df):
+
+    plt.figure(figsize=(16,8))
+    plt.axhline(label='_nolegend_', 
+                color = 'purple',
+                ls = ':')
+
+    ax = sns.scatterplot(data = melt_df.sample(100, random_state = 123), 
+                x = 'logerror actual', 
+                y = 'residual',
+                hue = 'cols',
+                y_jitter = .5,
+                x_jitter = .5,
+                s = 75)
+
+    legend = ax.legend()
+    plt.legend()
+    plt.xlabel('Actual Home Value')
+    plt.ylabel('Residual Error')
+    plt.title('Model Residual Plot')
+    plt.show()
+
+    
+# plotting actual home values, baseline_mean_predictions predictions, and model predictions
+def plot_models(melt_df):
+
+    plt.figure(figsize = (16, 8))
+    plt.plot(melt_df['logerror actual'], melt_df['baseline_prediction'], alpha=0.5,
+            color='gray', ls = ':', label='_nolegend_')
+
+    plt.plot(melt_df['logerror actual'], melt_df['logerror actual'], alpha=0.5,
+            color='blue', label='_nolegend_')
+
+    ax = sns.scatterplot(data = melt_df.sample(300, random_state = 123), 
+            x = 'logerror actual', 
+            y = "vals", 
+            hue = 'cols',
+            y_jitter = .5,
+            x_jitter = .5,
+            s = 50)
+
+    legend = ax.legend()
+    plt.legend()
+    plt.xlabel("Actual Log Error")
+    plt.ylabel('Predicted Log Error')
+    plt.title('Actual Log Error vs Predicted Cluster Log Error')
+    plt.show()
+
+    
+def model_distributions(df):
+    # Distribution of my model predictions (linear & polynomial)
+    plt.figure(figsize=(16,8))
+
+    plt.hist(df['logerror actual'], color='lightgray', alpha=0.5, label='Actual Log Error')
+
+    plt.hist(df['linear_predictions'], color = 'red', alpha=0.5, label='Linear Regression')
+
+    plt.hist(df['pca_predictions'], color = 'tab:olive', alpha=0.5, label='Principal Component Analysis')
+
+    plt.hist(df['polynomial degree 2'], color = 'purple', alpha=0.5, label='Polynomial Deg. 2')
+
+
+    plt.xlabel('Log Error')
+    plt.ylabel('Frequency')
+    plt.title('Frequency of Log Error by Predictive Model')
+    plt.legend()
+    
+    
 '''-----------------------------------'''
 # borrowed/previous lesson functions
 

@@ -300,6 +300,36 @@ def sum_outliers(df, k = 1.5):
     return new_df
 
 
+def zillow_outliers(df):
+
+    df = df[df["home_value"] >= (-443469.50)]
+    df = df[df["home_value"] <= 1256382.50]
+
+    df = df[df["logerror"] >= (-0.12)]
+    df = df[df["logerror"] <= 0.14]
+
+    df = df[df["bedroom_count"] >= 1.00]
+    df = df[df["bedroom_count"] <= 5.50]
+
+    df = df[df["bathroom_count"] >= 0.5]
+    df = df[df["bathroom_count"] <= 4.5]
+
+    df = df[df["living_sq_feet"] >= (-289.00)]
+    df = df[df["living_sq_feet"] <= 3863.00]
+
+    df = df[df["property_sq_feet"] >= 775.00]
+    df = df[df["property_sq_feet"] <= 13591.00]
+
+    df = df[df["year_built"] >= 1906.00]
+    df = df[df["year_built"] <= 2022.00]
+
+    df = df[df["home_age"] >= 1.00]
+    df = df[df["home_age"] <= 110.50]
+
+    return df
+
+
+
 '''Function determines outliers based on "iqr" and then capps outliers at upper-bound'''
 def capp_outliers(df, k = 1.5):
     
@@ -391,6 +421,39 @@ def establish_baseline(train, validate):
     print(f'validate shape: {validate.shape}')
 
     return train, validate
+
+# Function returns rasidual/error reports for model predictions
+def get_error_report(y, y_hat):
+    # importing math.sqrt module for calculations
+    from math import sqrt
+    
+    # generating model residuals and residuals squared
+    df = y - y_hat
+    df["residual^2"] = df.round(2) ** 2
+
+    # generating sum of squared error
+    SSE = sum(df["residual^2"])
+
+    # generating explained sum of squares
+    ESS = sum((y_hat - y.mean()) ** 2)
+
+    # generating total sum of squares error
+    TSS = ESS + SSE
+
+    # generating mean squared error
+    MSE = SSE/len(y)
+
+    # generating root mean squared error
+    RMSE = sqrt(MSE)
+
+    print(f'{y_hat.name} SSE: {SSE}')
+    print(f'{y_hat.name} ESS: {ESS}')
+    print(f'{y_hat.name} TSS: {TSS}')
+    print(f'{y_hat.name} MSE: {MSE}')
+    print(f'{y_hat.name} RMSE: {RMSE}')
+
+    return SSE, ESS, TSS, MSE, RMSE
+
 
 '''-----------------------------------'''
 # borrowed/previous lesson functions

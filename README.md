@@ -23,7 +23,6 @@ In this analysis I use Zillow's "Zestimate"/prediction home value error as measu
 
 1. I first acquired and cleaned a Zillow 2017 real-estate dataset
 2. I used an “Inter-Quartile Range” (IQR) method to determine outliers in the dataset and filtered out homes over the 1.2 million dollar valuation, as this proved to be well over the median single-family household range for the state of California.*
-
 3. I identified and treated missing values using a K-nearest neighbor imputer method
 4. I created and tested statistical hypotheses to explore the market trends that I was curious about
 5. I binned and grouped dataset features to create unique classification clusters to use them in unsupervised machine learning models and better segment the real-estate market
@@ -117,22 +116,22 @@ A mid-century modern design home - may provide a feeling of both nostalgia and f
 
 </br>
 
-|Ranking|Feature|Mapped Characteristic|
-|----|----|----|
-1|size_clusters_2|1566-2037 sq. ft|
-2|era_clusters_3|Early 20th Century|
-3|month_clusters_2|March|
-4|era_clusters_1|Late 20th Century|
-5|size_clusters_3|2037-3855 sq. ft|
-6|month_clusters_4|May|
-7|month_clusters_8|April|
-8|month_clusters_0|June|
-9|month_clusters_7|September|
-10|size_clusters_1|1241-1566 sq. ft|
-11|month_clusters_3|July|
-12|month_clusters_1|August|
-13|month_clusters_5|February
-14|size_clusters_0|360-1241 sq. ft|
+|Feature|Mapped Characteristic|
+|----|----|
+|size_clusters_2|1566-2037 sq. ft|
+|era_clusters_3|Early 20th Century|
+|month_clusters_2|March|
+|era_clusters_1|Late 20th Century|
+|size_clusters_3|2037-3855 sq. ft|
+|month_clusters_4|May|
+|month_clusters_8|April|
+|month_clusters_0|June|
+|month_clusters_7|September|
+|size_clusters_1|1241-1566 sq. ft|
+|month_clusters_3|July|
+|month_clusters_1|August|
+|month_clusters_5|February
+|size_clusters_0|360-1241 sq. ft|
 
 <br>
 

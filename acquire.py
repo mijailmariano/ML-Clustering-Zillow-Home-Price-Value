@@ -619,8 +619,8 @@ def impute_val_and_test(train_df, val_df, test_df):
 # function establishes a baseline for train and validate - will be used for model comparison:
 def establish_baseline(train, validate):
 
-    baseline_train = round(train["logerror"].mean(), 2)
-    baseline_val = round(validate["logerror"].mean(), 2)
+    baseline_train = round(train["logerror"].mean(), 4)
+    baseline_val = round(validate["logerror"].mean(), 4)
 
     train['baseline'] = baseline_train
     validate['baseline'] = baseline_val
@@ -795,6 +795,15 @@ def model_distributions(df):
     plt.title('Frequency of Log Error by Predictive Model')
     plt.legend()
     
+
+# function retrieves final readout on test dataset
+def final_rmse():
+    final_rmse = pd.DataFrame({
+    "Test": ["Baseline", "Train", "Validate", "Final (test)"],
+    "RMSE": [0.05,0.05,0.05,0.05],
+    "Relative Diff.": [0.0, 0.0, 0.0, 0.0]})
+
+    return final_rmse
     
 '''-----------------------------------'''
 # borrowed/previous lesson functions

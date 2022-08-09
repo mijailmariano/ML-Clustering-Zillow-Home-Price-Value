@@ -5,7 +5,7 @@ import numpy as np
 
 # importing data visualization libraries
 import matplotlib.pyplot as plt
-import seaborn as sns 
+import seaborn as sns
 sns.set()
 
 # sklearn library for data science

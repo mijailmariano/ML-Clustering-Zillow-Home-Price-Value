@@ -14,7 +14,7 @@ This analysis is a continuation of my ``Zillow Regression Analysis`` that may be
 
 The intent of this project is to leverage unsupervised machine learning clustering techniques to help reframe how we think about real-estate information, and make improvements to accurately assess and predict a home's value.
 
-In this analysis I use Zillow's "Zestimate"/prediction home value error as measured by the **logarithmic error** in the dataset as the predicted target variable and quality measure of information clusters to better explain the home value story.  
+In this analysis I use Zillow's "Zestimate"/prediction home value error as measured by the **logarithmic error** in the dataset as the predicted target variable and quality measure of the clusters I create to better explain the home value story.  
 
 ``logerror = log(Predicted: Zestimate) − log(Actual: Home Transaction Price)``
 

@@ -21,11 +21,17 @@ In this analysis I use Zillow's "Zestimate"/prediction home value error as measu
 ----
 <u>**``In Brief:``**</u>
 
-1. I create three (3) distinctly grouped feature clusters.
+1. I first acquired and cleaned a Zillow 2017 real-estate dataset
+2. I used an “Inter-Quartile Range” (IQR) method to determine outliers in the dataset and filtered out homes over the 1.2 million dollar valuation, as this proved to be well over the median single-family household range for the state of California.*
+
+3. I identified and treated missing values using a K-nearest neighbor imputer method
+4. I created and tested statistical hypotheses to explore the market trends that I was curious about
+5. I binned and grouped dataset features to create unique classification clusters to use them in unsupervised machine learning models and better segment the real-estate market
+6. I create three (3) distinctly grouped feature clusters
 
 **"Monthly Clusters"**
 
-    A home's total property square feet and the month that a home's transaction is recorded.*
+    A home's total property square feet and the calendar month that a home's transaction is recorded.
 
 **"Era Clusters"**
 
@@ -35,7 +41,7 @@ In this analysis I use Zillow's "Zestimate"/prediction home value error as measu
 
     A home's total age in years through 2017 and the size range of a home as measured in living square feet.
 
-2. I use SKLearn's RFE in conjuction with linear & non-linear regression models to test the quality of the clusters in predicting logerror.
+7. I use SKLearn's RFE in conjuction with linear & non-linear regression models to test the quality of the clusters in predicting logerror.
 
 **Linear Models**
 
@@ -49,7 +55,15 @@ In this analysis I use Zillow's "Zestimate"/prediction home value error as measu
     - Polynomial w/Degree 2
     - Principal Component Analysis (PCA)
 
+8. I deployed the clusters I created with both linear and non-linear statistical models to predict logarithmic error
+9. Finally, I evaluated the performance of my models and generated recommendations for follow-on analysis and implementation of my findings 
 
+
+
+
+<br></br>
+
+*I believe that homes over the 1.2mil USD evaluation would warrant another distinct analysis & modeling processing.* * 
 
 ----
 #### **<u>Exploration Questions & Hypotheses:</u>**
@@ -164,12 +178,12 @@ A mid-century modern design home - may provide a feeling of both nostalgia and f
 
 ----
 
-### **<u>``Analysis Summary``</u>**
-
-
-
-
 ### **``Recommendations:``**
+
+
+Conducting a “build home-style” analysis to record the differences across era architectural styles and test whether or not the unique architectural design styles of a home can directly impact its predicted home value. 
+
+I would incentivize and elicit through surveys what unique design features home sellers or potential buyers have included in their homes and/or look for in a new home. This can also help us to understand homes’ unique internal design components that have been introduced over the years and test whether or not this helps to tell the home value story.
 
 
 
@@ -179,7 +193,7 @@ A mid-century modern design home - may provide a feeling of both nostalgia and f
 
 * Acquire full year Zillow dataset for analysis
 * Attempt to view and segment the transaction periods in other meaningful ways (i.e., weekly, bi-monthly, quarters, bi-yearly snapshots)
-* Convert longitude and latitude to proper plotting coordinates and measure their relationship to logerror/home value to include other geographical features (i.e., zip code, blockgroup assingment code, county zoning code)
+* Convert longitude and latitude to proper plotting coordinates and measure their relationship to logerror/home value to include other geographical features (i.e., zip code, blockgroup assignment code, county zoning code)
 
 ----
 ### **<u>Repository Roadmap:</u>**

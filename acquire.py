@@ -21,6 +21,7 @@ import datetime
 import env
 from env import user, password, host, get_connection
 
+# importing math module
 import math
 from math import sqrt
 
@@ -741,7 +742,7 @@ def plot_model_residuals(melt_df):
                 hue = 'cols',
                 y_jitter = .5,
                 x_jitter = .5,
-                s = 75)
+                s = 50)
 
     legend = ax.legend()
     plt.legend()
@@ -751,7 +752,7 @@ def plot_model_residuals(melt_df):
     plt.show()
 
     
-# plotting actual home values, baseline_mean_predictions predictions, and model predictions
+# plotting actual logerror, baseline_predictions, and model predictions
 def plot_models(melt_df):
 
     plt.figure(figsize = (16, 8))

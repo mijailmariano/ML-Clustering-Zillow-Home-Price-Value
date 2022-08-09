@@ -3,14 +3,14 @@
 ### Zillow Real Estate Dataset
 ----
 
-##### Mijail Q. Mariano
+##### Created by: Mijail Q. Mariano
 ##### github.com/mijailmariano
 
 <br>
 
 ### **<u>Project Description & Goals:</u>**
 
-This analysis is a continuation of the Zillow Regression analysis that may be found here: <a href="https://github.com/mijailmariano/zillow_regression" target="_blank">Zillow Regression Analysis</a>
+This analysis is a continuation of my Zillow Regression analysis that may be found here: <a href="https://github.com/mijailmariano/zillow_regression" target="_blank">Zillow Regression Analysis</a>
 
 The intent of this project is to leverage unsupervised machine learning clustering techniques to help reframe how we think about real-estate information, and make improvements in accurately assessing and predicting a home's value.
 

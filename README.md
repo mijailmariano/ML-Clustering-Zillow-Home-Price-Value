@@ -68,7 +68,7 @@ In this analysis I use Zillow's "Zestimate"/prediction home value error as measu
 ----
 #### **<u>Exploration Questions & Hypotheses:</u>**
 
-**1. Is there a difference in logerror across transaction month?```**
+**1. Is there a difference in logerror across transaction month?**
 
 Given the many economic factors that may influence the housing market, I belive that this could also lead to challenges in accurate and timely home evaluations - thus leading to over, or under estimating a home's true value.
 

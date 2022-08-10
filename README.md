@@ -25,7 +25,7 @@ In this analysis I use Zillow's "Zestimate"/prediction home value error as measu
 2. I used an “Inter-Quartile Range” (IQR) method to determine outliers in the dataset and filtered out homes over the 1.2 million dollar valuation, as this proved to be well over the median single-family household range for the state of California.*
 3. I identified and treated missing values using a K-nearest neighbor imputer method
 4. I created and tested statistical hypotheses to explore the market trends that I was curious about
-5. I binned and grouped dataset features to create unique classification clusters to use them in unsupervised machine learning models and better segment the real-estate market
+5. To uniquely segment the real-estate data I bin and group dataset features to create classification clusters and used these clusters in unsupervised machine learning models
 6. I create three (3) distinctly grouped feature clusters
 
 **"Monthly Clusters"**

@@ -116,30 +116,32 @@ A mid-century modern design home - may provide a feeling of both nostalgia and f
 
 </br>
 
-|Feature|Mapped Characteristic|
-|----|----|
-|size_clusters_2|1566-2037 sq. ft|
-|era_clusters_3|Early 20th Century|
-|month_clusters_2|March|
-|era_clusters_1|Late 20th Century|
-|size_clusters_3|2037-3855 sq. ft|
-|month_clusters_4|May|
-|month_clusters_8|April|
-|month_clusters_0|June|
-|month_clusters_7|September|
-|size_clusters_1|1241-1566 sq. ft|
-|month_clusters_3|July|
-|month_clusters_1|August|
-|month_clusters_5|February
-|size_clusters_0|360-1241 sq. ft|
+| Ranking       | Feature       | Characteristic       |
+| ----          | ----          | ----                 |
+| 1     | size_clusters_1       | 1241-1566 sq. ft     |
+| 2     | era_clusters_3        | Early 20th Century   |
+| 3     | era_clusters_2        | Mid 20th Century     |
+| 4     | era_clusters_0        | New Century          |
+| 5     | month_clusters_4      | May                  |
+| 6     | month_clusters_0      | June                 |
+| 7     | size_clusters_0       | 360-1241 sq. ft      |
+| 8     |month_clusters_6       | January              |
+| 9     | size_clusters_2       | 1566-2037 sq. ft     |
+| 10    | month_clusters_8      | April                |
+| 11    | month_clusters_1      | August               |
+| 12    | month_clusters_3      | July                 |
+| 13    | month_clusters_2      | March                |
+| 14    | month_clusters_7      | September            |
+| 15    | size_clusters_3       | 2037-3855 sq. ft     |
+
+
 
 <br>
 
-<u>``RFE non-selected:``</u>
-
-* era_clusters_0 (New Century)
-* era_clusters_2 (Mid 20th Century)
-* month_clusters_6 (January)
+| RFE non-selected      | Characteristic            |
+| ----                  | ----                      |
+| era_clusters_1        | Late 20th Century         |
+| month_clusters_5      | February                  |
 
 ----
 

@@ -59,7 +59,6 @@ In this analysis I use Zillow's "Zestimate"/prediction home value error as measu
 
 
 
-
 <br></br>
 
 *I believe that homes over the 1.2mil USD evaluation would warrant another distinct analysis & modeling processing.* * 

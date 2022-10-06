@@ -643,7 +643,8 @@ def establish_baseline(train, validate):
 
 # creating a recursive feature eliminate function
 def recursive_feature_eliminate(X_train, y_train, number_of_top_features):
-
+    '''Creating a recursive feature eliminate function'''
+    
     # initialize the ML algorithm
     lm = LinearRegression()
 
